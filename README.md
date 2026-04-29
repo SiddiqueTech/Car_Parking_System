@@ -36,7 +36,7 @@ It demonstrates how core concepts can be applied to build a real-world parking m
 ## 🚀 How to Run
 1. Download or clone the repository  
 2. Open the project folder  
-3. Run `index.html` in your browser  
+3. Run `Parking_system.html` in your browser  
 
 ---
 
