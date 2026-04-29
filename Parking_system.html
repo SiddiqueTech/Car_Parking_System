@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Parking Management System</title>
+    <style>
+        /* ========== GLOBAL STYLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ========== CONTAINER ========== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '🚗 🅿️ 🚙';
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.1;
+            top: 10px;
+            left: 0;
+            right: 0;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .data-structures {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .ds-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .content {
+            display: flex;
+            min-height: 600px;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 20px;
+            background: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(50,50,93,0.11);
+            color: #333;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(50,50,93,0.1);
+            background: #4facfe;
+            color: white;
+        }
+
+        .menu-btn.active {
+            background: #4facfe;
+            color: white;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .menu-btn i {
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ========== MAIN AREA ========== */
+        .main-area {
+            flex: 1;
+            padding: 30px;
+            background: #fafbfc;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== FORM STYLES ========== */
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4facfe;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 1.1em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        /* ========== STATUS GRID ========== */
+        .stats-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .slot {
+            padding: 20px 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slot:hover {
+            transform: scale(1.05);
+        }
+
+        .slot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .slot:hover::before {
+            opacity: 1;
+        }
+
+        .slot.vacant {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .slot.occupied {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .slot-number {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .slot-status {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* ========== TABLES ========== */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .table th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f2f6;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* ========== NOTIFICATIONS ========== */
+        .notification {
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: none;
+            animation: slideIn 0.3s ease;
+            border-left: 5px solid;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left-color: #28a745;
+            display: block;
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-left-color: #dc3545;
+            display: block;
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+            border-left-color: #17a2b8;
+            display: block;
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
+        @media (max-width: 992px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+            
+            .menu-btn {
+                flex: 1;
+                min-width: 150px;
+                justify-content: center;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slots-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .menu-btn {
+                min-width: 120px;
+                padding: 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 25px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .slots-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* ========== ANIMATIONS ========== */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ========== LOADING ========== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER SECTION -->
+        <div class="header">
+            <h1><i class="fas fa-car"></i> Car Parking Management System</h1>
+            <p>Automated Parking Solution Using Data Structures</p>
+            <p><small>Array | Queue | Stack | BST | Vector</small></p>
+            
+            <div class="data-structures">
+                <span class="ds-badge">Array (Parking Slots)</span>
+                <span class="ds-badge">Queue (Waiting Vehicles)</span>
+                <span class="ds-badge">Stack (Undo Operations)</span>
+                <span class="ds-badge">BST (Fast Search)</span>
+                <span class="ds-badge">Vector (Storage)</span>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="content">
+            <!-- SIDEBAR MENU -->
+            <div class="sidebar">
+                <button class="menu-btn active" onclick="showSection('park')">
+                    <i class="fas fa-parking"></i> Park Vehicle
+                </button>
+                <button class="menu-btn" onclick="showSection('remove')">
+                    <i class="fas fa-sign-out-alt"></i> Remove Vehicle
+                </button>
+                <button class="menu-btn" onclick="showSection('status')">
+                    <i class="fas fa-chart-bar"></i> Parking Status
+                </button>
+                <button class="menu-btn" onclick="showSection('search')">
+                    <i class="fas fa-search"></i> Search Vehicle
+                </button>
+                <button class="menu-btn" onclick="showSection('queue')">
+                    <i class="fas fa-clock"></i> Waiting Queue
+                </button>
+                <button class="menu-btn" onclick="showSection('history')">
+                    <i class="fas fa-history"></i> History Log
+                </button>
+                <button class="menu-btn" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i> System Settings
+                </button>
+            </div>
+
+            <!-- MAIN AREA -->
+            <div class="main-area">
+                <!-- PARK VEHICLE SECTION -->
+                <div id="park-section" class="section active">
+                    <h2><i class="fas fa-car-side"></i> Park a Vehicle</h2>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-id-card"></i> Registration Number</label>
+                        <input type="text" id="reg-number" class="form-control" placeholder="e.g., ABC-123" maxlength="20">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Driver Name</label>
+                        <input type="text" id="driver-name" class="form-control" placeholder="e.g., John Smith">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-car"></i> Vehicle Type</label>
+                        <select id="vehicle-type" class="form-control">
+                            <option value="Car">Car</option>
+                            <option value="Bike">Motorcycle</option>
+                            <option value="Truck">Truck</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Van">Van</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="parkVehicle()">
+                        <i class="fas fa-check-circle"></i> Park Vehicle
+                    </button>
+                    
+                    <button class="btn btn-danger" onclick="clearParkForm()" style="margin-left: 10px;">
+                        <i class="fas fa-times"></i> Clear Form
+                    </button>
+                    
+                    <div id="park-notification" class="notification"></div>
+                </div>
+
+                <!-- REMOVE VEHICLE SECTION -->
+                <div id="remove-section" class="section">
+                    <h2><i class="fas fa-sign-out-alt"></i> Remove Vehicle</h2>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-id-card"></i> Registration Number to Remove</label>
+                        <input type="text" id="remove-reg" class="form-control" placeholder="Enter registration number">
+                    </div>
+                    
+                    <button class="btn btn-danger" onclick="removeVehicle()">
+                        <i class="fas fa-trash-alt"></i> Remove Vehicle
+                    </button>
+                    
+                    <button class="btn" onclick="removeBySlot()" style="margin-left: 10px;">
+                        <i class="fas fa-map-marker-alt"></i> Remove by Slot
+                    </button>
+                    
+                    <div id="remove-notification" class="notification"></div>
+                </div>
+
+                <!-- PARKING STATUS SECTION -->
+                <div id="status-section" class="section">
+                    <h2><i class="fas fa-chart-bar"></i> Parking Status</h2>
+                    
+                    <div class="stats-container">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3 id="total-slots">20</h3>
+                                <p>Total Slots</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="occupied-slots">0</h3>
+                                <p>Occupied</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="available-slots">20</h3>
+                                <p>Available</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3 id="waiting-count">0</h3>
+                                <p>In Queue</p>
+                            </div>
+                        </div>
+                        
+                        <div class="slots-grid" id="slots-grid">
+                            <!-- Slots will be dynamically generated here -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="updateStatus()">
+                        <i class="fas fa-sync-alt"></i> Refresh Status
+                    </button>
+                </div>
+
+                <!-- SEARCH VEHICLE SECTION -->
+                <div id="search-section" class="section">
+                    <h2><i class="fas fa-search"></i> Search Vehicle</h2>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-id-card"></i> Enter Registration Number</label>
+                        <input type="text" id="search-reg" class="form-control" placeholder="Search by registration">
+                    </div>
+                    
+                    <button class="btn" onclick="searchVehicle()">
+                        <i class="fas fa-search"></i> Search Vehicle
+                    </button>
+                    
+                    <button class="btn" onclick="searchByDriver()" style="margin-left: 10px;">
+                        <i class="fas fa-user"></i> Search by Driver
+                    </button>
+                    
+                    <div id="search-result" style="margin-top: 30px;"></div>
+                </div>
+
+                <!-- WAITING QUEUE SECTION -->
+                <div id="queue-section" class="section">
+                    <h2><i class="fas fa-clock"></i> Waiting Queue</h2>
+                    
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Registration</th>
+                                    <th>Driver</th>
+                                    <th>Type</th>
+                                    <th>Wait Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queue-table-body">
+                                <!-- Queue items will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button class="btn" onclick="updateQueue()" style="margin-top: 20px;">
+                        <i class="fas fa-sync-alt"></i> Refresh Queue
+                    </button>
+                </div>
+
+                <!-- HISTORY LOG SECTION -->
+                <div id="history-section" class="section">
+                    <h2><i class="fas fa-history"></i> History Log</h2>
+                    
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Action</th>
+                                    <th>Registration</th>
+                                    <th>Slot</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <!-- History items will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button class="btn btn-danger" onclick="clearHistory()" style="margin-top: 20px;">
+                        <i class="fas fa-trash"></i> Clear History
+                    </button>
+                </div>
+
+                <!-- SETTINGS SECTION -->
+                <div id="settings-section" class="section">
+                    <h2><i class="fas fa-cog"></i> System Settings</h2>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-hashtag"></i> Total Parking Slots</label>
+                        <input type="number" id="total-slots-input" class="form-control" value="20" min="1" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-list-ol"></i> Waiting Queue Size</label>
+                        <input type="number" id="queue-size-input" class="form-control" value="10" min="1" max="50">
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                    
+                    <button class="btn btn-danger" onclick="resetSystem()" style="margin-left: 10px;">
+                        <i class="fas fa-redo"></i> Reset System
+                    </button>
+                    
+                    <div id="settings-notification" class="notification" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== PARKING SYSTEM DATA STRUCTURES ==========
+        let parkingSystem = {
+            totalSlots: 20,
+            occupiedSlots: 0,
+            slots: [],
+            waitingQueue: [],
+            parkedVehicles: [],
+            history: [],
+            settings: {
+                queueSize: 10,
+                autoAssign: true
+            }
+        };
+
+        // ========== INITIALIZE SYSTEM ==========
+        function initializeSystem() {
+            // Initialize slots
+            for(let i = 1; i <= parkingSystem.totalSlots; i++) {
+                let slotType = "Regular";
+                if(i <= 2) slotType = "Handicapped";
+                else if(i <= 5) slotType = "Compact";
+                
+                parkingSystem.slots.push({
+                    number: i,
+                    type: slotType,
+                    occupied: false,
+                    vehicle: null
+                });
+            }
+            
+            // Load from localStorage if available
+            loadFromStorage();
+            
+            // Update display
+            updateStatus();
+            updateQueue();
+            updateHistory();
+            
+            // Auto-save every 30 seconds
+            setInterval(saveToStorage, 30000);
+        }
+
+        // ========== PARK VEHICLE FUNCTION ==========
+        function parkVehicle() {
+            const regNumber = document.getElementById('reg-number').value.trim();
+            const driverName = document.getElementById('driver-name').value.trim();
+            const vehicleType = document.getElementById('vehicle-type').value;
+            
+            // Validation
+            if(!regNumber || !driverName) {
+                showNotification('park-notification', 'Please fill all required fields!', 'error');
+                return;
+            }
+            
+            // Check if vehicle already parked
+            if(isVehicleParked(regNumber)) {
+                showNotification('park-notification', 'This vehicle is already parked!', 'error');
+                return;
+            }
+            
+            // Find available slot
+            let parkedSlot = -1;
+            for(let i = 0; i < parkingSystem.slots.length; i++) {
+                if(!parkingSystem.slots[i].occupied) {
+                    parkedSlot = i;
+                    break;
+                }
+            }
+            
+            if(parkedSlot !== -1) {
+                // Park in available slot
+                const slot = parkingSystem.slots[parkedSlot];
+                const vehicle = {
+                    regNumber: regNumber,
+                    driverName: driverName,
+                    vehicleType: vehicleType,
+                    slotNumber: slot.number,
+                    entryTime: new Date(),
+                    entryTimestamp: Date.now()
+                };
+                
+                slot.occupied = true;
+                slot.vehicle = vehicle;
+                parkingSystem.occupiedSlots++;
+                parkingSystem.parkedVehicles.push(vehicle);
+                
+                // Add to history
+                addHistory('PARK', regNumber, slot.number, `Parked ${vehicleType} at Slot ${slot.number}`);
+                
+                // Show success message
+                showNotification('park-notification', 
+                    ` Vehicle parked successfully at Slot ${slot.number}!`, 'success');
+                
+                // Clear form
+                clearParkForm();
+                
+                // Update displays
+                updateStatus();
+                
+            } else {
+                // Add to waiting queue if queue not full
+                if(parkingSystem.waitingQueue.length < parkingSystem.settings.queueSize) {
+                    const waitingVehicle = {
+                        regNumber: regNumber,
+                        driverName: driverName,
+                        vehicleType: vehicleType,
+                        timeAdded: new Date(),
+                        waitStart: Date.now()
+                    };
+                    
+                    parkingSystem.waitingQueue.push(waitingVehicle);
+                    
+                    // Add to history
+                    addHistory('QUEUE', regNumber, null, 'Added to waiting queue');
+                    
+                    showNotification('park-notification', 
+                        `⏳ Parking is full! Vehicle added to waiting queue (Position: ${parkingSystem.waitingQueue.length})`, 'info');
+                    
+                    clearParkForm();
+                    updateQueue();
+                    
+                } else {
+                    showNotification('park-notification', 
+                        ' Parking is full and waiting queue is also full!', 'error');
+                }
+            }
+            
+            saveToStorage();
+        }
+
+        // ========== REMOVE VEHICLE FUNCTION ==========
+        function removeVehicle() {
+            const regNumber = document.getElementById('remove-reg').value.trim();
+            
+            if(!regNumber) {
+                showNotification('remove-notification', 'Please enter registration number!', 'error');
+                return;
+            }
+            
+            let removed = false;
+            
+            // Search in parked vehicles
+            for(let i = 0; i < parkingSystem.slots.length; i++) {
+                const slot = parkingSystem.slots[i];
+                if(slot.occupied && slot.vehicle.regNumber === regNumber) {
+                    // Calculate parking duration
+                    const entryTime = slot.vehicle.entryTime;
+                    const exitTime = new Date();
+                    const duration = Math.floor((exitTime - entryTime) / 60000); // in minutes
+                    
+                    // Add to history
+                    addHistory('REMOVE', regNumber, slot.number, 
+                        `Removed from Slot ${slot.number}. Parked for ${duration} minutes`);
+                    
+                    // Remove vehicle
+                    slot.occupied = false;
+                    const removedVehicle = slot.vehicle;
+                    slot.vehicle = null;
+                    parkingSystem.occupiedSlots--;
+                    
+                    // Remove from parked vehicles array
+                    parkingSystem.parkedVehicles = parkingSystem.parkedVehicles.filter(
+                        v => v.regNumber !== regNumber
+                    );
+                    
+                    // Show success message
+                    showNotification('remove-notification', 
+                        ` Vehicle removed successfully from Slot ${slot.number}! ` +
+                        `Parking duration: ${duration} minutes`, 'success');
+                    
+                    // Clear input
+                    document.getElementById('remove-reg').value = '';
+                    
+                    removed = true;
+                    
+                    // Check waiting queue
+                    if(parkingSystem.waitingQueue.length > 0) {
+                        const nextVehicle = parkingSystem.waitingQueue.shift();
+                        
+                        // Park the waiting vehicle
+                        slot.occupied = true;
+                        slot.vehicle = {
+                            regNumber: nextVehicle.regNumber,
+                            driverName: nextVehicle.driverName,
+                            vehicleType: nextVehicle.vehicleType,
+                            slotNumber: slot.number,
+                            entryTime: new Date(),
+                            entryTimestamp: Date.now()
+                        };
+                        
+                        parkingSystem.occupiedSlots++;
+                        parkingSystem.parkedVehicles.push(slot.vehicle);
+                        
+                        // Add to history
+                        addHistory('AUTO_PARK', nextVehicle.regNumber, slot.number, 
+                            'Auto-parked from waiting queue');
+                        
+                        showNotification('remove-notification', 
+                            ` Waiting vehicle ${nextVehicle.regNumber} auto-parked at Slot ${slot.number}!`, 'info');
+                    }
+                    
+                    break;
+                }
+            }
+            
+            if(!removed) {
+                showNotification('remove-notification', '❌ Vehicle not found in parking!', 'error');
+            }
+            
+            updateStatus();
+            updateQueue();
+            saveToStorage();
+        }
+
+        // ========== SEARCH VEHICLE FUNCTION ==========
+        function searchVehicle() {
+            const regNumber = document.getElementById('search-reg').value.trim();
+            const resultDiv = document.getElementById('search-result');
+            
+            if(!regNumber) {
+                resultDiv.innerHTML = '<div class="notification error">Please enter registration number!</div>';
+                return;
+            }
+            
+            let found = false;
+            let resultHTML = '';
+            
+            // Search in parked vehicles
+            for(let slot of parkingSystem.slots) {
+                if(slot.occupied && slot.vehicle.regNumber === regNumber) {
+                    const vehicle = slot.vehicle;
+                    const duration = Math.floor((Date.now() - vehicle.entryTimestamp) / 60000);
+                    
+                    resultHTML = `
+                        <div class="notification success">
+                            <h3><i class="fas fa-check-circle"></i> Vehicle Found!</h3>
+                            <p><strong>Registration:</strong> ${vehicle.regNumber}</p>
+                            <p><strong>Driver:</strong> ${vehicle.driverName}</p>
+                            <p><strong>Type:</strong> ${vehicle.vehicleType}</p>
+                            <p><strong>Slot:</strong> ${vehicle.slotNumber} (${slot.type})</p>
+                            <p><strong>Entry Time:</strong> ${vehicle.entryTime.toLocaleString()}</p>
+                            <p><strong>Parked For:</strong> ${duration} minutes</p>
+                        </div>
+                    `;
+                    found = true;
+                    break;
+                }
+            }
+            
+            // Search in waiting queue
+            if(!found) {
+                for(let i = 0; i < parkingSystem.waitingQueue.length; i++) {
+                    const vehicle = parkingSystem.waitingQueue[i];
+                    if(vehicle.regNumber === regNumber) {
+                        const waitTime = Math.floor((Date.now() - vehicle.waitStart) / 60000);
+                        resultHTML = `
+                            <div class="notification info">
+                                <h3><i class="fas fa-clock"></i> Vehicle in Waiting Queue</h3>
+                                <p><strong>Registration:</strong> ${vehicle.regNumber}</p>
+                                <p><strong>Driver:</strong> ${vehicle.driverName}</p>
+                                <p><strong>Type:</strong> ${vehicle.vehicleType}</p>
+                                <p><strong>Queue Position:</strong> ${i + 1}</p>
+                                <p><strong>Waiting For:</strong> ${waitTime} minutes</p>
+                                <p><strong>Time Added:</strong> ${vehicle.timeAdded.toLocaleString()}</p>
+                            </div>
+                        `;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            
+            if(!found) {
+                resultHTML = '<div class="notification error"><i class="fas fa-times-circle"></i> Vehicle not found!</div>';
+            }
+            
+            resultDiv.innerHTML = resultHTML;
+        }
+
+        // ========== UPDATE STATUS DISPLAY ==========
+        function updateStatus() {
+            // Update statistics
+            document.getElementById('total-slots').textContent = parkingSystem.totalSlots;
+            document.getElementById('occupied-slots').textContent = parkingSystem.occupiedSlots;
+            document.getElementById('available-slots').textContent = 
+                parkingSystem.totalSlots - parkingSystem.occupiedSlots;
+            document.getElementById('waiting-count').textContent = parkingSystem.waitingQueue.length;
+            
+            // Update slots grid
+            const slotsGrid = document.getElementById('slots-grid');
+            slotsGrid.innerHTML = '';
+            
+            parkingSystem.slots.forEach(slot => {
+                const slotDiv = document.createElement('div');
+                slotDiv.className = `slot ${slot.occupied ? 'occupied' : 'vacant'}`;
+                
+                let content = `
+                    <div class="slot-number">Slot ${slot.number}</div>
+                    <div class="slot-status">${slot.occupied ? '🚗 Occupied' : '✅ Vacant'}</div>
+                `;
+                
+                if(slot.occupied) {
+                    content += `<small>${slot.vehicle.regNumber}</small>`;
+                } else {
+                    content += `<small>${slot.type}</small>`;
+                }
+                
+                slotDiv.innerHTML = content;
+                
+                // Add click event to show details
+                slotDiv.onclick = () => showSlotDetails(slot);
+                
+                slotsGrid.appendChild(slotDiv);
+            });
+        }
+
+        // ========== UPDATE QUEUE DISPLAY ==========
+        function updateQueue() {
+            const tableBody = document.getElementById('queue-table-body');
+            tableBody.innerHTML = '';
+            
+            if(parkingSystem.waitingQueue.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #666;">
+                            <i class="fas fa-check-circle" style="font-size: 2em; color: #2ecc71;"></i>
+                            <p style="margin-top: 10px;">No vehicles waiting</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            parkingSystem.waitingQueue.forEach((vehicle, index) => {
+                const waitTime = Math.floor((Date.now() - vehicle.waitStart) / 60000);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${vehicle.regNumber}</strong></td>
+                    <td>${vehicle.driverName}</td>
+                    <td>${vehicle.vehicleType}</td>
+                    <td>${waitTime} min</td>
+                    <td>
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;" 
+                                onclick="removeFromQueue('${vehicle.regNumber}')">
+                            <i class="fas fa-times"></i> Remove
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // ========== HISTORY FUNCTIONS ==========
+        function updateHistory() {
+            const tableBody = document.getElementById('history-table-body');
+            tableBody.innerHTML = '';
+            
+            if(parkingSystem.history.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #666;">
+                            <i class="fas fa-history" style="font-size: 2em;"></i>
+                            <p style="margin-top: 10px;">No history recorded yet</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Show last 20 entries
+            const recentHistory = parkingSystem.history.slice(-20).reverse();
+            
+            recentHistory.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(entry.timestamp).toLocaleTimeString()}</td>
+                    <td>
+                        ${getActionIcon(entry.action)} 
+                        ${entry.action}
+                    </td>
+                    <td>${entry.regNumber || '-'}</td>
+                    <td>${entry.slotNumber || '-'}</td>
+                    <td>${entry.details}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function addHistory(action, regNumber, slotNumber, details) {
+            const historyEntry = {
+                timestamp: Date.now(),
+                action: action,
+                regNumber: regNumber,
+                slotNumber: slotNumber,
+                details: details
+            };
+            
+            parkingSystem.history.push(historyEntry);
+            updateHistory();
+        }
+
+        // ========== HELPER FUNCTIONS ==========
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId + '-section').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Update data if needed
+            if(sectionId === 'status') {
+                updateStatus();
+            } else if(sectionId === 'queue') {
+                updateQueue();
+            } else if(sectionId === 'history') {
+                updateHistory();
+            }
+        }
+
+        function showNotification(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `notification ${type}`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                element.className = 'notification';
+            }, 5000);
+        }
+
+        function isVehicleParked(regNumber) {
+            return parkingSystem.slots.some(slot => 
+                slot.occupied && slot.vehicle.regNumber === regNumber
+            );
+        }
+
+        function getActionIcon(action) {
+            const icons = {
+                'PARK': '🅿️',
+                'REMOVE': '🚗',
+                'QUEUE': '⏳',
+                'AUTO_PARK': '🔄',
+                'SETTINGS': '⚙️'
+            };
+            return icons[action] || '📝';
+        }
+
+        function clearParkForm() {
+            document.getElementById('reg-number').value = '';
+            document.getElementById('driver-name').value = '';
+            document.getElementById('vehicle-type').value = 'Car';
+        }
+
+        function removeFromQueue(regNumber) {
+            parkingSystem.waitingQueue = parkingSystem.waitingQueue.filter(
+                v => v.regNumber !== regNumber
+            );
+            
+            addHistory('REMOVE_QUEUE', regNumber, null, 'Removed from waiting queue');
+            updateQueue();
+            saveToStorage();
+            
+            showNotification('park-notification', 
+                `Vehicle ${regNumber} removed from waiting queue`, 'info');
+        }
+
+        function showSlotDetails(slot) {
+            let message;
+            if(slot.occupied) {
+                const vehicle = slot.vehicle;
+                const duration = Math.floor((Date.now() - vehicle.entryTimestamp) / 60000);
+                message = `
+                    Slot ${slot.number} (${slot.type})
+                    ------------------------------
+                    Vehicle: ${vehicle.regNumber}
+                    Driver: ${vehicle.driverName}
+                    Type: ${vehicle.vehicleType}
+                    Entry Time: ${vehicle.entryTime.toLocaleString()}
+                    Duration: ${duration} minutes
+                `;
+            } else {
+                message = `
+                    Slot ${slot.number} (${slot.type})
+                    ------------------------------
+                    Status: Available
+                    Type: ${slot.type}
+                    Ready for parking
+                `;
+            }
+            alert(message);
+        }
+
+        // ========== SETTINGS FUNCTIONS ==========
+        function saveSettings() {
+            const newTotalSlots = parseInt(document.getElementById('total-slots-input').value);
+            const newQueueSize = parseInt(document.getElementById('queue-size-input').value);
+            
+            if(newTotalSlots < parkingSystem.occupiedSlots) {
+                showNotification('settings-notification', 
+                    `Cannot reduce slots below ${parkingSystem.occupiedSlots} occupied slots!`, 'error');
+                return;
+            }
+            
+            // Update total slots
+            if(newTotalSlots !== parkingSystem.totalSlots) {
+                const diff = newTotalSlots - parkingSystem.totalSlots;
+                
+                if(diff > 0) {
+                    // Add new slots
+                    for(let i = parkingSystem.totalSlots + 1; i <= newTotalSlots; i++) {
+                        let type = "Regular";
+                        if(i <= 2) type = "Handicapped";
+                        else if(i <= 5) type = "Compact";
+                        
+                        parkingSystem.slots.push({
+                            number: i,
+                            type: type,
+                            occupied: false,
+                            vehicle: null
+                        });
+                    }
+                } else {
+                    // Remove slots (only if they're empty)
+                    for(let i = parkingSystem.slots.length - 1; i >= newTotalSlots; i--) {
+                        if(!parkingSystem.slots[i].occupied) {
+                            parkingSystem.slots.pop();
+                        }
+                    }
+                }
+                
+                parkingSystem.totalSlots = newTotalSlots;
+            }
+            
+            // Update queue size
+            parkingSystem.settings.queueSize = newQueueSize;
+            
+            // Trim waiting queue if needed
+            if(parkingSystem.waitingQueue.length > newQueueSize) {
+                parkingSystem.waitingQueue = parkingSystem.waitingQueue.slice(0, newQueueSize);
+            }
+            
+            addHistory('SETTINGS', null, null, 'System settings updated');
+            showNotification('settings-notification', 'Settings saved successfully!', 'success');
+            
+            updateStatus();
+            updateQueue();
+            saveToStorage();
+        }
+
+        function resetSystem() {
+            if(confirm('Are you sure you want to reset the entire system? This will clear all data!')) {
+                // Reset all data
+                parkingSystem = {
+                    totalSlots: 20,
+                    occupiedSlots: 0,
+                    slots: [],
+                    waitingQueue: [],
+                    parkedVehicles: [],
+                    history: [],
+                    settings: {
+                        queueSize: 10,
+                        autoAssign: true
+                    }
+                };
+                
+                // Re-initialize
+                initializeSystem();
+                
+                // Reset form inputs
+                document.getElementById('total-slots-input').value = 20;
+                document.getElementById('queue-size-input').value = 10;
+                
+                addHistory('SYSTEM', null, null, 'System reset to default');
+                showNotification('settings-notification', 'System reset successfully!', 'success');
+            }
+        }
+
+        // ========== STORAGE FUNCTIONS ==========
+        function saveToStorage() {
+            try {
+                localStorage.setItem('parkingSystemData', JSON.stringify(parkingSystem));
+            } catch(e) {
+                console.log('Error saving to localStorage:', e);
+            }
+        }
+
+        function loadFromStorage() {
+            try {
+                const savedData = localStorage.getItem('parkingSystemData');
+                if(savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    
+                    // Convert date strings back to Date objects
+                    parsedData.slots.forEach(slot => {
+                        if(slot.vehicle && slot.vehicle.entryTime) {
+                            slot.vehicle.entryTime = new Date(slot.vehicle.entryTime);
+                        }
+                    });
+                    
+                    parsedData.waitingQueue.forEach(vehicle => {
+                        if(vehicle.timeAdded) {
+                            vehicle.timeAdded = new Date(vehicle.timeAdded);
+                        }
+                    });
+                    
+                    parkingSystem = parsedData;
+                }
+            } catch(e) {
+                console.log('Error loading from localStorage:', e);
+            }
+        }
+
+        // ========== INITIALIZE ON LOAD ==========
+        window.onload = function() {
+            initializeSystem();
+            
+            // Set up Enter key for forms
+            document.getElementById('reg-number').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') parkVehicle();
+            });
+            
+            document.getElementById('driver-name').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') parkVehicle();
+            });
+            
+            document.getElementById('search-reg').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') searchVehicle();
+            });
+            
+            document.getElementById('remove-reg').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') removeVehicle();
+            });
+        };
+    </script>
+</body>
+</html>
